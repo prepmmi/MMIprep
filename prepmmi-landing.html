@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PrepMMI — AI Mock MMI Practice for Med School Interviews</title>
+<meta name="description" content="Practice real MMI stations with instant AI feedback. Built for medical school applicants who need to prep fast, not book a $400 coaching call.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#12181F;
+    --paper:#F3F5F6;
+    --paper-2:#E7EBEC;
+    --card:#FFFFFF;
+    --signal:#FF5A2E;
+    --signal-dim:#FFE4D9;
+    --line:#D8DEE1;
+    --muted:#5B6670;
+    --font-display:'Space Grotesk', sans-serif;
+    --font-body:'Inter', sans-serif;
+    --font-mono:'IBM Plex Mono', monospace;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:var(--font-body);
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:inherit;}
+  .wrap{max-width:1120px;margin:0 auto;padding:0 24px;}
+
+  /* NAV */
+  header{
+    position:sticky;top:0;z-index:50;
+    background:rgba(243,245,246,0.85);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+  }
+  nav{display:flex;align-items:center;justify-content:space-between;padding:18px 0;}
+  .logo{
+    font-family:var(--font-display);
+    font-weight:700;
+    font-size:20px;
+    letter-spacing:-0.02em;
+    display:flex;align-items:center;gap:8px;
+  }
+  .logo .dot{width:9px;height:9px;border-radius:50%;background:var(--signal);display:inline-block;}
+  .navlinks{display:flex;gap:32px;font-size:14.5px;font-weight:500;}
+  .navlinks a{text-decoration:none;color:var(--muted);transition:color .15s;}
+  .navlinks a:hover{color:var(--ink);}
+  .login-link{color:var(--ink) !important;font-weight:700;border-left:1px solid var(--line);padding-left:32px;}
+  .nav-cta{
+    background:var(--ink);color:#fff;border:none;padding:10px 20px;border-radius:8px;
+    font-family:var(--font-body);font-weight:600;font-size:14px;cursor:pointer;text-decoration:none;
+  }
+  .navlinks-mobile{display:none;}
+
+  /* HERO */
+  .hero{padding:72px 0 60px;}
+  .hero-grid{display:grid;grid-template-columns:1.05fr 0.95fr;gap:56px;align-items:center;}
+  .eyebrow{
+    font-family:var(--font-mono);font-size:12.5px;letter-spacing:0.08em;text-transform:uppercase;
+    color:var(--signal);font-weight:600;margin-bottom:18px;display:flex;align-items:center;gap:8px;
+  }
+  .eyebrow::before{content:'';width:16px;height:1px;background:var(--signal);display:inline-block;}
+  h1{
+    font-family:var(--font-display);
+    font-size:clamp(36px,4.6vw,58px);
+    font-weight:700;
+    line-height:1.04;
+    letter-spacing:-0.02em;
+    margin:0 0 22px;
+  }
+  h1 em{font-style:normal;color:var(--signal);}
+  .sub{font-size:18px;color:var(--muted);max-width:480px;margin:0 0 32px;}
+  .hero-ctas{display:flex;gap:14px;align-items:center;flex-wrap:wrap;}
+  .btn-primary{
+    background:var(--signal);color:#fff;border:none;padding:15px 26px;border-radius:9px;
+    font-family:var(--font-body);font-weight:700;font-size:15.5px;cursor:pointer;text-decoration:none;
+    display:inline-block;transition:transform .15s, box-shadow .15s;
+    box-shadow:0 6px 18px rgba(255,90,46,0.28);
+  }
+  .btn-primary:hover{transform:translateY(-1px);box-shadow:0 10px 24px rgba(255,90,46,0.34);}
+  .btn-ghost{
+    color:var(--ink);text-decoration:none;font-weight:600;font-size:15px;
+    border-bottom:1px solid var(--ink);padding-bottom:2px;
+  }
+  .hero-meta{margin-top:22px;font-size:13.5px;color:var(--muted);font-family:var(--font-mono);}
+
+  /* STATION RING — signature element */
+  .ring-wrap{position:relative;display:flex;align-items:center;justify-content:center;}
+  .ring-stage{position:relative;width:100%;max-width:400px;aspect-ratio:1/1;}
+  .ring-center{
+    position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+    width:44%;height:44%;border-radius:50%;
+    background:var(--card);border:1px solid var(--line);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    box-shadow:0 20px 40px rgba(18,24,31,0.08);
+  }
+  .ring-center .clock{
+    font-family:var(--font-mono);font-weight:600;font-size:clamp(26px,4vw,34px);
+    color:var(--ink);letter-spacing:-0.02em;
+  }
+  .ring-center .clock-label{
+    font-family:var(--font-mono);font-size:10.5px;letter-spacing:0.08em;text-transform:uppercase;
+    color:var(--signal);margin-top:6px;font-weight:600;
+  }
+  .station{
+    position:absolute;width:74px;height:74px;border-radius:16px;
+    background:var(--card);border:1px solid var(--line);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    font-family:var(--font-mono);font-size:11px;color:var(--muted);font-weight:600;
+    box-shadow:0 8px 20px rgba(18,24,31,0.06);
+    transition:all .4s ease;
+  }
+  .station .n{font-size:9px;letter-spacing:0.06em;text-transform:uppercase;color:var(--muted);}
+  .station .label{font-family:var(--font-body);font-size:11.5px;color:var(--ink);font-weight:600;margin-top:2px;text-align:center;}
+  .station.active{
+    background:var(--ink);border-color:var(--ink);
+    transform:scale(1.14);
+    box-shadow:0 12px 28px rgba(18,24,31,0.28);
+  }
+  .station.active .n{color:var(--signal);}
+  .station.active .label{color:#fff;}
+
+  /* stations positioned around circle via inline style set by JS */
+
+  /* SECTION GENERIC */
+  section{padding:64px 0;}
+  .section-head{max-width:600px;margin:0 0 44px;}
+  .section-eyebrow{
+    font-family:var(--font-mono);font-size:12px;letter-spacing:0.08em;text-transform:uppercase;
+    color:var(--muted);margin-bottom:12px;
+  }
+  h2{font-family:var(--font-display);font-size:clamp(26px,3.2vw,38px);font-weight:700;letter-spacing:-0.01em;margin:0 0 14px;}
+  .lede{font-size:16.5px;color:var(--muted);}
+
+  /* WHAT IS MMI */
+  .format-strip{
+    display:grid;grid-template-columns:repeat(4,1fr);gap:1px;
+    background:var(--line);border:1px solid var(--line);border-radius:14px;overflow:hidden;
+  }
+  .format-cell{background:var(--card);padding:26px 22px;}
+  .format-cell .k{font-family:var(--font-mono);font-size:26px;font-weight:600;color:var(--signal);}
+  .format-cell .v{font-size:13.5px;color:var(--muted);margin-top:6px;line-height:1.45;}
+
+  /* HOW IT WORKS */
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;}
+  .step{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:28px;}
+  .step .idx{font-family:var(--font-mono);color:var(--signal);font-weight:600;font-size:13px;margin-bottom:14px;}
+  .step h3{font-family:var(--font-display);font-size:19px;margin:0 0 8px;font-weight:600;}
+  .step p{font-size:14.5px;color:var(--muted);margin:0;}
+
+  /* PRICING */
+  .pricing-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;}
+  .pack{
+    background:var(--card);border:1px solid var(--line);border-radius:16px;padding:24px 20px;
+    display:flex;flex-direction:column;
+    transition:border-color .15s, transform .15s;
+  }
+  .pack:hover{border-color:var(--signal);transform:translateY(-3px);}
+  .pack.featured{border-color:var(--ink);position:relative;}
+  .pack.featured::before{
+    content:'MOST POPULAR';font-family:var(--font-mono);font-size:9.5px;letter-spacing:0.06em;
+    color:#fff;background:var(--ink);position:absolute;top:-11px;left:20px;padding:4px 10px;border-radius:6px;
+  }
+  .pack .name{font-family:var(--font-display);font-weight:700;font-size:16.5px;margin-bottom:4px;}
+  .pack .count{font-family:var(--font-mono);font-size:12.5px;color:var(--muted);margin-bottom:16px;}
+  .pack .price{font-family:var(--font-display);font-size:30px;font-weight:700;margin-bottom:18px;}
+  .pack .price span{font-size:13px;color:var(--muted);font-weight:500;font-family:var(--font-body);}
+  .pack-cta{
+    margin-top:auto;background:var(--paper-2);color:var(--ink);border:none;padding:11px;border-radius:8px;
+    font-weight:600;font-size:13.5px;cursor:pointer;text-decoration:none;text-align:center;display:block;
+    transition:background .15s;
+  }
+  .pack.featured .pack-cta{background:var(--signal);color:#fff;}
+  .pack-cta:hover{background:var(--ink);color:#fff;}
+
+  /* FAQ */
+  .faq-item{border-bottom:1px solid var(--line);padding:20px 0;cursor:pointer;}
+  .faq-q{display:flex;justify-content:space-between;align-items:center;font-weight:600;font-size:15.5px;}
+  .faq-q .plus{font-family:var(--font-mono);color:var(--signal);font-size:18px;transition:transform .2s;}
+  .faq-item.open .plus{transform:rotate(45deg);}
+  .faq-a{max-height:0;overflow:hidden;transition:max-height .25s ease;font-size:14.5px;color:var(--muted);}
+  .faq-item.open .faq-a{max-height:200px;padding-top:12px;}
+
+  /* FOOTER CTA */
+  .cta-band{
+    background:var(--ink);color:#fff;border-radius:20px;padding:56px 44px;text-align:center;margin:20px 0 40px;
+  }
+  .cta-band h2{color:#fff;}
+  .cta-band .lede{color:#B9C0C6;max-width:480px;margin:0 auto 28px;}
+
+  footer{border-top:1px solid var(--line);padding:32px 0;font-size:13px;color:var(--muted);}
+  .foot-row{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;}
+
+  @media (max-width:860px){
+    .hero-grid{grid-template-columns:1fr;}
+    .navlinks{display:none;}
+    .format-strip{grid-template-columns:repeat(2,1fr);}
+    .steps{grid-template-columns:1fr;}
+    .pricing-grid{grid-template-columns:repeat(2,1fr);}
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{transition:none !important;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <nav>
+      <div class="logo"><span class="dot"></span>PrepMMI</div>
+      <div class="navlinks">
+        <a href="#format">The Format</a>
+        <a href="#how">How It Works</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#faq">FAQ</a>
+        <a href="/app" class="login-link">Log In</a>
+      </div>
+      <a href="#pricing" class="nav-cta">Start practicing</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <div class="eyebrow">AI Mock MMI · Instant Feedback</div>
+      <h1>Six stations.<br>Two minutes to think.<br><em>Zero surprises.</em></h1>
+      <p class="sub">Practice the real MMI format — timed prompts, timed responses, station after station — and get AI feedback on every answer before you're standing in the actual hallway.</p>
+      <div class="hero-ctas">
+        <a href="#pricing" class="btn-primary">Start your first circuit</a>
+        <a href="#how" class="btn-ghost">See how it works</a>
+      </div>
+      <div class="hero-meta">NO SCHEDULING · PRACTICE ANY TIME · UNDER $10 TO START</div>
+    </div>
+
+    <div class="ring-wrap">
+      <div class="ring-stage" id="ringStage">
+        <div class="ring-center">
+          <div class="clock" id="clockDisplay">02:00</div>
+          <div class="clock-label" id="clockLabel">Read Prompt</div>
+        </div>
+        <!-- stations injected by JS -->
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="format">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="section-eyebrow">The Multiple Mini Interview</div>
+      <h2>Not a conversation. A circuit.</h2>
+      <p class="lede">MMIs rotate you through short, independent stations — each testing a different scenario. There's no "getting comfortable" partway through, because every station starts cold.</p>
+    </div>
+    <div class="format-strip">
+      <div class="format-cell"><div class="k">6–10</div><div class="v">Independent stations per circuit, each scored separately</div></div>
+      <div class="format-cell"><div class="k">2 min</div><div class="v">To read the prompt and gather your thoughts before you speak</div></div>
+      <div class="format-cell"><div class="k">5–8 min</div><div class="v">To respond, once the bell rings and the door opens</div></div>
+      <div class="format-cell"><div class="k">1</div><div class="v">New evaluator at every station — no momentum carries over</div></div>
+    </div>
+  </div>
+</section>
+
+<section id="how">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="section-eyebrow">How PrepMMI works</div>
+      <h2>The same rhythm as the real thing</h2>
+      <p class="lede">Pick a circuit, and we run you through it exactly like interview day — reading period, response window, bell, next station.</p>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="idx">01</div>
+        <h3>Read the prompt</h3>
+        <p>An ethical scenario, a role-play task, or a policy question appears. You get a real prep window to organize your thinking — no rushing in cold.</p>
+      </div>
+      <div class="step">
+        <div class="idx">02</div>
+        <h3>Answer on camera</h3>
+        <p>The bell rings, the timer starts, and you respond out loud — same pressure, same pacing as the actual station.</p>
+      </div>
+      <div class="step">
+        <div class="idx">03</div>
+        <h3>Get scored, station by station</h3>
+        <p>AI feedback on reasoning, communication, and composure for each station — plus a full-circuit report when you finish the set.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="pricing">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="section-eyebrow">Pricing</div>
+      <h2>Pick how many full circuits you want</h2>
+      <p class="lede">Every circuit is a complete mock MMI — 6 fresh, AI-generated stations across ethics, roleplay, policy, personal, teamwork, and scenario categories. No repeats between circuits.</p>
+    </div>
+    <div class="pricing-grid">
+      <div class="pack">
+        <div class="name">Starter</div>
+        <div class="count">1 circuit · 6 stations</div>
+        <div class="price">$7<span> one-time</span></div>
+        <a href="#" class="pack-cta" data-pack="starter">Get started</a>
+      </div>
+      <div class="pack">
+        <div class="name">Confidence</div>
+        <div class="count">3 circuits · 18 stations</div>
+        <div class="price">$15<span> one-time</span></div>
+        <a href="#" class="pack-cta" data-pack="confidence">Get started</a>
+      </div>
+      <div class="pack featured">
+        <div class="name">Mastery</div>
+        <div class="count">5 circuits · 30 stations</div>
+        <div class="price">$22<span> one-time</span></div>
+        <a href="#" class="pack-cta" data-pack="mastery">Get started</a>
+      </div>
+      <div class="pack">
+        <div class="name">Expert</div>
+        <div class="count">8 circuits · 48 stations</div>
+        <div class="price">$32<span> one-time</span></div>
+        <a href="#" class="pack-cta" data-pack="expert">Get started</a>
+      </div>
+      <div class="pack">
+        <div class="name">Full Prep</div>
+        <div class="count">12 circuits · 72 stations</div>
+        <div class="price">$42<span> one-time</span></div>
+        <a href="#" class="pack-cta" data-pack="acceptance">Get started</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="faq">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="section-eyebrow">FAQ</div>
+      <h2>Questions applicants actually ask</h2>
+    </div>
+    <div class="faq-list">
+      <div class="faq-item">
+        <div class="faq-q"><span>Is this only for MD/DO applicants?</span><span class="plus">+</span></div>
+        <div class="faq-a">MMI shows up in med, dental, pharmacy, PA, and vet admissions — the station format and scoring are the same either way, so it works for any MMI-format interview.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q"><span>Do I need to know my school's exact stations?</span><span class="plus">+</span></div>
+        <div class="faq-a">No — the point of MMI is that stations are novel by design. We rotate you through the same categories (ethics, roleplay, policy, personal) so you're comfortable with the format itself, not memorized answers.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q"><span>How fast can I start?</span><span class="plus">+</span></div>
+        <div class="faq-a">Immediately after checkout — no scheduling, no waiting on a coach's calendar.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q"><span>What do I need?</span><span class="plus">+</span></div>
+        <div class="faq-a">A laptop or phone with a camera and mic, and a quiet 30 minutes per circuit.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="cta-band">
+      <h2>Your interview invite doesn't wait. Neither should your prep.</h2>
+      <p class="lede">Run your first circuit today — no coach to book, no calendar to wait on.</p>
+      <a href="#pricing" class="btn-primary">Start your first circuit</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap foot-row">
+    <div>© 2026 PrepMMI. Not affiliated with the AAMC or any medical school.</div>
+    <div>support@prepmmi.com</div>
+  </div>
+</footer>
+
+<script>
+  // Build the station ring
+  const stationNames = ['Ethics','Roleplay','Policy','Personal','Teamwork','Scenario'];
+  const stage = document.getElementById('ringStage');
+  const radius = 43; // percent of stage
+  const stations = [];
+  stationNames.forEach((name, i) => {
+    const angle = (i / stationNames.length) * 2 * Math.PI - Math.PI/2;
+    const x = 50 + radius * Math.cos(angle);
+    const y = 50 + radius * Math.sin(angle);
+    const el = document.createElement('div');
+    el.className = 'station';
+    el.style.left = `calc(${x}% - 37px)`;
+    el.style.top = `calc(${y}% - 37px)`;
+    el.innerHTML = `<div class="n">0${i+1}</div><div class="label">${name}</div>`;
+    stage.appendChild(el);
+    stations.push(el);
+  });
+
+  // Animate: cycle active station + countdown
+  let activeIdx = 0;
+  let phase = 'prep'; // prep -> answer
+  let seconds = 120;
+  const clockEl = document.getElementById('clockDisplay');
+  const labelEl = document.getElementById('clockLabel');
+
+  function setActive(idx){
+    stations.forEach((s,i) => s.classList.toggle('active', i === idx));
+  }
+  setActive(0);
+
+  function formatTime(s){
+    const m = Math.floor(s/60).toString().padStart(2,'0');
+    const sec = (s%60).toString().padStart(2,'0');
+    return `${m}:${sec}`;
+  }
+
+  setInterval(() => {
+    seconds -= 4; // sped up for demo purposes
+    if (seconds <= 0){
+      if (phase === 'prep'){
+        phase = 'answer';
+        seconds = 360;
+        labelEl.textContent = 'Respond';
+      } else {
+        phase = 'prep';
+        activeIdx = (activeIdx + 1) % stations.length;
+        setActive(activeIdx);
+        seconds = 120;
+        labelEl.textContent = 'Read Prompt';
+      }
+    }
+    clockEl.textContent = formatTime(seconds);
+  }, 1000);
+
+  // FAQ accordion
+  document.querySelectorAll('.faq-item').forEach(item => {
+    item.addEventListener('click', () => {
+      const wasOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+      if (!wasOpen) item.classList.add('open');
+    });
+  });
+
+  // Pricing CTAs — wire these to Stripe Payment Links once created
+  document.querySelectorAll('.pack-cta').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const pack = btn.getAttribute('data-pack');
+      // TODO: replace with real Stripe Payment Link per pack, e.g.:
+      // window.location.href = 'https://buy.stripe.com/xxxxx';
+      alert(`Checkout for "${pack}" pack — wire this button to your Stripe Payment Link.`);
+    });
+  });
+</script>
+
+</body>
+</html>

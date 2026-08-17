@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — PrepMMI / Denterview</title>
+<style>
+  *{box-sizing:border-box;}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#F3F5F6;margin:0;padding:32px;color:#12181F;}
+  .wrap{max-width:760px;margin:0 auto;}
+  h1{font-size:22px;margin-bottom:4px;}
+  .sub{color:#5B6670;font-size:13.5px;margin-bottom:28px;}
+  .card{background:#fff;border:1px solid #D8DEE1;border-radius:12px;padding:24px;margin-bottom:20px;}
+  .card h2{font-size:16px;margin:0 0 16px;}
+  label{display:block;font-size:13px;font-weight:600;margin-bottom:6px;margin-top:14px;}
+  input,select{width:100%;padding:10px 12px;border:1px solid #D8DEE1;border-radius:8px;font-size:14px;}
+  button{margin-top:18px;background:#FF5A2E;color:#fff;border:none;padding:11px 20px;border-radius:8px;font-weight:700;cursor:pointer;font-size:14px;}
+  button:disabled{opacity:0.5;cursor:not-allowed;}
+  button.secondary{background:#12181F;}
+  .result{margin-top:16px;padding:14px;border-radius:8px;font-size:13.5px;white-space:pre-wrap;display:none;}
+  .result.ok{background:#DCFCE7;color:#166534;display:block;}
+  .result.err{background:#FEE2E2;color:#991B1B;display:block;}
+  table{width:100%;border-collapse:collapse;font-size:13px;}
+  th,td{text-align:left;padding:8px 6px;border-bottom:1px solid #E7EBEC;}
+  th{color:#5B6670;font-weight:600;}
+  #gate{max-width:340px;margin:120px auto;text-align:center;}
+  #gate input{margin-bottom:12px;}
+  #app{display:none;}
+</style>
+</head>
+<body>
+
+<div id="gate">
+  <h1>Admin Access</h1>
+  <p class="sub">Enter your admin key to continue.</p>
+  <input type="password" id="adminKeyInput" placeholder="Admin key">
+  <button onclick="unlock()">Unlock</button>
+  <div class="result err" id="gateError"></div>
+</div>
+
+<div id="app">
+  <div class="wrap">
+    <h1>Admin Panel</h1>
+    <p class="sub">Manual account management + recent purchases, for Denterview and PrepMMI.</p>
+
+    <div class="card">
+      <h2>Server URL</h2>
+      <input type="text" id="serverUrl" placeholder="https://your-app.railway.app">
+    </div>
+
+    <div class="card">
+      <h2>Manually Create / Add Circuits</h2>
+      <label>Customer Email</label>
+      <input type="email" id="email" placeholder="customer@email.com">
+      <label>Circuits to Add</label>
+      <input type="number" id="unitCount" min="1" max="100" placeholder="e.g. 5">
+      <button onclick="createUser()" id="createBtn">Create / Add Circuits</button>
+      <div class="result" id="createResult"></div>
+    </div>
+
+    <div class="card">
+      <h2>Recent Purchases (Stripe)</h2>
+      <p class="sub" style="margin:0 0 14px;">For full sales totals, refunds, and per-product breakdowns, use Stripe Dashboard → Reports directly — this is just a quick glance.</p>
+      <button class="secondary" onclick="loadPurchases()">Refresh</button>
+      <div id="purchasesTable" style="margin-top:16px;"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  let ADMIN_KEY = '';
+
+  function unlock() {
+    ADMIN_KEY = document.getElementById('adminKeyInput').value.trim();
+    if (!ADMIN_KEY) return;
+    document.getElementById('gate').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+  }
+
+  function serverUrl() {
+    return document.getElementById('serverUrl').value.trim().replace(/\/$/, '');
+  }
+
+  async function createUser() {
+    const btn = document.getElementById('createBtn');
+    const resultDiv = document.getElementById('createResult');
+    const email = document.getElementById('email').value.trim();
+    const unitCount = parseInt(document.getElementById('unitCount').value);
+
+    if (!serverUrl() || !email || !unitCount) {
+      resultDiv.className = 'result err';
+      resultDiv.textContent = 'Fill in server URL, email, and circuit count.';
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Working...';
+    try {
+      const resp = await fetch(`${serverUrl()}/api/admin/create-user`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-admin-key': ADMIN_KEY },
+        body: JSON.stringify({ email, unitCount })
+      });
+      const data = await resp.json();
+      if (data.success) {
+        resultDiv.className = 'result ok';
+        resultDiv.textContent = `✅ ${data.isReturning ? 'Credits added to existing account' : 'New account created'}\nEmail: ${data.email}\nUnits: ${data.unitCount}`;
+      } else {
+        resultDiv.className = 'result err';
+        resultDiv.textContent = `❌ ${data.message}`;
+      }
+    } catch (e) {
+      resultDiv.className = 'result err';
+      resultDiv.textContent = `❌ Network error: ${e.message}`;
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Create / Add Credits';
+    }
+  }
+
+  async function loadPurchases() {
+    const container = document.getElementById('purchasesTable');
+    container.textContent = 'Loading...';
+    try {
+      const resp = await fetch(`${serverUrl()}/api/admin/recent-purchases`, {
+        headers: { 'x-admin-key': ADMIN_KEY }
+      });
+      const data = await resp.json();
+      if (!data.success) {
+        container.textContent = `Error: ${data.message}`;
+        return;
+      }
+      if (data.purchases.length === 0) {
+        container.textContent = 'No purchases yet.';
+        return;
+      }
+      let html = '<table><tr><th>Email</th><th>Item</th><th>Amount</th><th>Date</th></tr>';
+      for (const p of data.purchases) {
+        html += `<tr><td>${p.email || '—'}</td><td>${p.item}</td><td>$${p.amount ?? '—'}</td><td>${new Date(p.created).toLocaleString()}</td></tr>`;
+      }
+      html += '</table>';
+      container.innerHTML = html;
+    } catch (e) {
+      container.textContent = `Network error: ${e.message}`;
+    }
+  }
+</script>
+
+</body>
+</html>

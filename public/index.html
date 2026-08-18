@@ -3,8 +3,75 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PrepMMI — AI Mock MMI Practice for Med School Interviews</title>
-<meta name="description" content="Practice real MMI stations with instant AI feedback. Built for medical school applicants who need to prep fast, not book a $400 coaching call.">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+<meta name="theme-color" content="#12181F">
+<title>MMI Prep: AI Mock Interview Practice for Med School | PrepMMI</title>
+<meta name="description" content="Practice real Multiple Mini Interview (MMI) stations with instant AI feedback — ethics, roleplay, policy, and personal prompts, timed just like interview day. Start for under $10, no scheduling required.">
+<link rel="canonical" href="https://www.prepmmi.com/">
+<meta name="robots" content="index, follow">
+<meta property="og:type" content="website">
+<meta property="og:title" content="MMI Prep: AI Mock Interview Practice for Med School | PrepMMI">
+<meta property="og:description" content="Practice real MMI stations with instant AI feedback — timed prompts, timed responses, station after station.">
+<meta property="og:url" content="https://www.prepmmi.com/">
+<meta property="og:image" content="https://www.prepmmi.com/assets/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="MMI Prep: AI Mock Interview Practice for Med School | PrepMMI">
+<meta name="twitter:description" content="Practice real MMI stations with instant AI feedback — timed prompts, timed responses, station after station.">
+<meta name="twitter:image" content="https://www.prepmmi.com/assets/og-image.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "PrepMMI",
+  "url": "https://www.prepmmi.com",
+  "description": "AI-powered Multiple Mini Interview (MMI) mock interview practice for medical, dental, pharmacy, PA, and vet school applicants.",
+  "email": "support@prepmmi.com"
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Is this only for MD/DO applicants?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "MMI shows up in med, dental, pharmacy, PA, and vet admissions — the station format and scoring are the same either way, so it works for any MMI-format interview."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Do I need to know my school's exact stations?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No — the point of MMI is that stations are novel by design. We rotate you through the same categories (ethics, roleplay, policy, personal) so you're comfortable with the format itself, not memorized answers."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How fast can I start?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Immediately after checkout — no scheduling, no waiting on a coach's calendar."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What do I need?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "A laptop or phone with a camera and mic, and a quiet 30 minutes per circuit."
+      }
+    }
+  ]
+}
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -51,10 +118,17 @@
     display:flex;align-items:center;gap:8px;
   }
   .logo .dot{width:9px;height:9px;border-radius:50%;background:var(--signal);display:inline-block;}
+  .logo img{width:26px;height:26px;display:block;}
   .navlinks{display:flex;gap:32px;font-size:14.5px;font-weight:500;}
   .navlinks a{text-decoration:none;color:var(--muted);transition:color .15s;}
   .navlinks a:hover{color:var(--ink);}
   .login-link{color:var(--ink) !important;font-weight:700;border-left:1px solid var(--line);padding-left:32px;}
+  .login-pill{
+    color:var(--ink) !important;font-weight:700;
+    background:var(--card);border:1.5px solid var(--ink);border-radius:8px;
+    padding:8px 16px !important;margin-left:16px;
+  }
+  .login-pill:hover{background:var(--ink);color:#fff !important;}
   .nav-cta{
     background:var(--ink);color:#fff;border:none;padding:10px 20px;border-radius:8px;
     font-family:var(--font-body);font-weight:600;font-size:14px;cursor:pointer;text-decoration:none;
@@ -197,8 +271,17 @@
   .cta-band h2{color:#fff;}
   .cta-band .lede{color:#B9C0C6;max-width:480px;margin:0 auto 28px;}
 
-  footer{border-top:1px solid var(--line);padding:32px 0;font-size:13px;color:var(--muted);}
+  footer{border-top:1px solid var(--line);padding:48px 0 32px;font-size:13px;color:var(--muted);}
   .foot-row{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;}
+  .foot-grid{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:32px;margin-bottom:28px;}
+  .foot-logo{font-family:var(--font-display);font-weight:700;font-size:17px;color:var(--ink);margin-bottom:8px;display:flex;align-items:center;gap:8px;}
+  .foot-tag{font-size:13.5px;color:var(--muted);max-width:280px;}
+  .foot-h{font-family:var(--font-mono);font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;}
+  .foot-links{display:flex;flex-direction:column;gap:9px;}
+  .foot-links a{text-decoration:none;color:var(--ink);font-size:14px;}
+  .foot-links a:hover{color:var(--signal);}
+  .foot-bottom{border-top:1px solid var(--line);padding-top:20px;}
+  @media (max-width:700px){.foot-grid{grid-template-columns:1fr;gap:24px;}}
 
   @media (max-width:860px){
     .hero-grid{grid-template-columns:1fr;}
@@ -217,13 +300,13 @@
 <header>
   <div class="wrap">
     <nav>
-      <div class="logo"><span class="dot"></span>PrepMMI</div>
+      <div class="logo"><img src="/assets/nav-mark.png" alt="PrepMMI logo">PrepMMI</div>
       <div class="navlinks">
         <a href="#format">The Format</a>
         <a href="#how">How It Works</a>
         <a href="#pricing">Pricing</a>
         <a href="#faq">FAQ</a>
-        <a href="/app" class="login-link">Log In</a>
+        <a href="/app" class="login-pill">Log In →</a>
       </div>
       <a href="#pricing" class="nav-cta">Start practicing</a>
     </nav>
@@ -378,9 +461,34 @@
 </section>
 
 <footer>
-  <div class="wrap foot-row">
-    <div>© 2026 PrepMMI. Not affiliated with the AAMC or any medical school.</div>
-    <div>support@prepmmi.com</div>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <div class="foot-logo"><img src="/assets/nav-mark.png" alt="PrepMMI logo" style="width:22px;height:22px;display:block;">PrepMMI</div>
+        <div class="foot-tag">AI-powered MMI mock interview practice for medical (and other MMI-format) school applicants.</div>
+      </div>
+      <div>
+        <div class="foot-h">Company</div>
+        <div class="foot-links">
+          <a href="#pricing">Pricing</a>
+          <a href="#faq">FAQ</a>
+          <a href="mailto:support@prepmmi.com">Contact</a>
+        </div>
+      </div>
+      <div>
+        <div class="foot-h">Legal</div>
+        <div class="foot-links">
+          <a href="/terms.html">Terms of Use</a>
+          <a href="/privacy.html">Privacy Policy</a>
+          <a href="/disclaimer.html">Disclaimer</a>
+          <a href="/return-policy.html">Return Policy</a>
+        </div>
+      </div>
+    </div>
+    <div class="foot-row foot-bottom">
+      <div>© 2026 PrepMMI. Not affiliated with the AAMC or any medical school.</div>
+      <div>support@prepmmi.com</div>
+    </div>
   </div>
 </footer>
 

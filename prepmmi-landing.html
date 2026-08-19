@@ -1,6 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-2JRE1VH7KK"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-2JRE1VH7KK');
+</script>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="icon" href="/favicon.ico" sizes="any">
@@ -29,7 +38,7 @@
   "name": "PrepMMI",
   "url": "https://www.prepmmi.com",
   "description": "AI-powered Multiple Mini Interview (MMI) mock interview practice for medical, dental, pharmacy, PA, and vet school applicants.",
-  "email": "support@prepmmi.com"
+  "email": "prepmmis@gmail.com"
 }
 </script>
 <script type="application/ld+json">
@@ -472,7 +481,7 @@
         <div class="foot-links">
           <a href="#pricing">Pricing</a>
           <a href="#faq">FAQ</a>
-          <a href="mailto:support@prepmmi.com">Contact</a>
+          <a href="mailto:prepmmis@gmail.com">Contact</a>
         </div>
       </div>
       <div>
@@ -487,7 +496,7 @@
     </div>
     <div class="foot-row foot-bottom">
       <div>© 2026 PrepMMI. Not affiliated with the AAMC or any medical school.</div>
-      <div>support@prepmmi.com</div>
+      <div>prepmmis@gmail.com</div>
     </div>
   </div>
 </footer>
@@ -556,14 +565,24 @@
     });
   });
 
-  // Pricing CTAs — wire these to Stripe Payment Links once created
+  // Pricing CTAs — wired to live Stripe Payment Links
+  const STRIPE_LINKS = {
+    starter: 'https://buy.stripe.com/4gM6oJfF11av5qdd9M87K00',
+    confidence: 'https://buy.stripe.com/3cIaEZ3Wj5qL8Cp8Tw87K01',
+    mastery: 'https://buy.stripe.com/cNifZj1Ob5qLaKx7Ps87K02',
+    expert: 'https://buy.stripe.com/bJe00l9gD8CX3i50n087K03',
+    acceptance: 'https://buy.stripe.com/9B6fZj50ndXh7yl6Lo87K04'
+  };
   document.querySelectorAll('.pack-cta').forEach(btn => {
     btn.addEventListener('click', (e) => {
       e.preventDefault();
       const pack = btn.getAttribute('data-pack');
-      // TODO: replace with real Stripe Payment Link per pack, e.g.:
-      // window.location.href = 'https://buy.stripe.com/xxxxx';
-      alert(`Checkout for "${pack}" pack — wire this button to your Stripe Payment Link.`);
+      const link = STRIPE_LINKS[pack];
+      if (link) {
+        window.location.href = link;
+      } else {
+        console.error('No Stripe link configured for pack:', pack);
+      }
     });
   });
 </script>

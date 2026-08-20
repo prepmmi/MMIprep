@@ -247,43 +247,67 @@ async function createAppUser(email, password, unitCount) {
   }
 }
 
+// ── BRAND EMAIL SHELL ──────────────────────────────────────────────────
+// Shared PrepMMI-branded wrapper (logo, brand colors, footer) used by every
+// outbound email so nothing ships with generic gray Denterview-style styling.
+const BRAND = { ink: '#12181F', paper: '#F3F5F6', signal: '#FF5A2E', muted: '#5B6670', line: '#D8DEE1' };
+const LOGO_URL = `${APP_URL}/assets/logo_master.png`;
+const LOGIN_URL = `${APP_URL}/app`;
+
+function brandButton(label, href) {
+  return `<div style="text-align:center;margin:26px 0 6px;">
+    <a href="${href}" style="display:inline-block;background:${BRAND.signal};color:#ffffff;font-weight:700;font-size:15px;padding:13px 28px;border-radius:9px;text-decoration:none;">${label}</a>
+  </div>`;
+}
+
+function brandedEmailShell(title, bodyHtml) {
+  return `
+  <div style="font-family: 'Helvetica Neue', Arial, sans-serif; max-width: 600px; margin: 0 auto; background:${BRAND.paper}; padding: 24px;">
+    <div style="background: ${BRAND.ink}; padding: 28px 30px; border-radius: 14px 14px 0 0; text-align: center;">
+      <img src="${LOGO_URL}" alt="PrepMMI" height="32" style="display:inline-block;margin-bottom:6px;">
+      <h1 style="color: white; margin: 6px 0 0; font-size: 20px;">${title}</h1>
+    </div>
+    <div style="background: #ffffff; padding: 30px; border-radius: 0 0 14px 14px; border: 1px solid ${BRAND.line}; border-top: none;">
+      ${bodyHtml}
+      <hr style="border: none; border-top: 1px solid ${BRAND.line}; margin: 28px 0 16px;">
+      <p style="color: ${BRAND.muted}; font-size: 12px; text-align: center; margin:0;">
+        PrepMMI &middot; Questions? Just reply to this email.<br>
+        <a href="${LOGIN_URL}" style="color:${BRAND.muted};">${LOGIN_URL.replace('https://', '')}</a>
+      </p>
+    </div>
+  </div>`;
+}
+
 async function sendWelcomeEmail(email, password, unitCount, isReturning = false) {
   const unitWord = unitCount === 1 ? 'circuit' : 'circuits';
-  const subject = isReturning ? `PrepMMI - ${unitCount === 1 ? 'Circuit' : 'Circuits'} Added!` : `Welcome to PrepMMI`;
+  const subject = isReturning ? `PrepMMI — ${unitCount} ${unitWord} added!` : `Welcome to PrepMMI — you're ready to start`;
+
   const welcomeMessage = isReturning
-    ? `<p style="font-size: 16px; color: #374151;">Thanks for coming back! We've added <strong>${unitCount} ${unitWord}</strong> to your account.</p>`
-    : `<p style="font-size: 16px; color: #374151;">Thanks for your purchase! You now have <strong>${unitCount} ${unitWord}</strong> ready to go.</p>`;
+    ? `<p style="font-size: 15px; color: #374151;">Thanks for coming back! We've added <strong>${unitCount} ${unitWord}</strong> to your account — <strong>${email}</strong>.</p>
+       <p style="font-size: 15px; color: #374151;">Log back in with your existing password to use them. Forgot it? There's a "Forgot password?" link on the login screen.</p>`
+    : `<p style="font-size: 15px; color: #374151;">Thanks for your purchase! You now have <strong>${unitCount} ${unitWord}</strong> ready to go.</p>
+       <div style="background: ${BRAND.paper}; padding: 18px 20px; border-radius: 10px; border: 1px solid ${BRAND.line}; margin: 18px 0;">
+         <p style="color: ${BRAND.muted}; margin: 0 0 8px; font-size: 13px;">Your login credentials</p>
+         <p style="font-size: 15px; color: #374151; margin: 4px 0;"><strong>Email:</strong> ${email}</p>
+         <p style="font-size: 15px; color: #374151; margin: 4px 0;"><strong>Password:</strong> <code style="background: #eef0f1; padding: 3px 8px; border-radius: 5px; font-family: monospace;">${password}</code></p>
+         <p style="color: #B91C1C; font-size: 13px; margin: 10px 0 0;">For security, change this password after your first login (Account menu → Change password).</p>
+       </div>
+       <p style="font-size: 15px; color: #374151;"><strong>How to start:</strong></p>
+       <ol style="font-size: 14px; color: #374151; padding-left: 18px; margin: 0;">
+         <li style="margin-bottom:6px;">Click the button below and log in with the email/password above.</li>
+         <li style="margin-bottom:6px;">On your dashboard, hit "Start a Circuit."</li>
+         <li style="margin-bottom:6px;">Allow camera/mic access — you'll get a prep window, then answer out loud for each of 6 stations.</li>
+         <li>Get AI feedback and a score per station right after you finish.</li>
+       </ol>`;
 
-  const credentialsSection = !isReturning ? `
-    <div style="background: white; padding: 20px; border-radius: 8px; border: 2px solid #111827; margin: 20px 0;">
-      <p style="color: #6b7280; margin: 0 0 10px 0; font-size: 14px;">Your Login Credentials:</p>
-      <p style="font-size: 16px; color: #374151; margin: 5px 0;"><strong>Email:</strong> ${email}</p>
-      <p style="font-size: 16px; color: #374151; margin: 5px 0;"><strong>Password:</strong> <code style="background: #f3f4f6; padding: 4px 8px; border-radius: 4px; font-family: monospace;">${password}</code></p>
-      <p style="color: #ef4444; font-size: 13px; margin-top: 10px;">⚠️ Save these credentials and change your password after logging in.</p>
-      <div style="margin-top: 25px; padding: 20px; background: #f0f4ff; border-radius: 8px; text-align: center;">
-        <p style="font-size: 16px; color: #374151; margin: 0;">
-          Go to <a href="${APP_URL}/app" style="color: #111827; font-weight: bold; text-decoration: none;">${APP_URL.replace('https://www.', '')}/app</a> to start.
-        </p>
-      </div>
-    </div>` : '';
+  const bodyHtml = `${welcomeMessage}${brandButton(isReturning ? 'Log In' : 'Log In & Start', LOGIN_URL)}`;
 
-  const htmlContent = `
-    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-      <div style="background: #111827; padding: 30px; border-radius: 10px 10px 0 0; text-align: center;">
-        <h1 style="color: white; margin: 0;">${isReturning ? 'Welcome Back!' : 'Welcome to PrepMMI!'}</h1>
-      </div>
-      <div style="background: #f9fafb; padding: 30px; border-radius: 0 0 10px 10px;">
-        ${welcomeMessage}
-        ${credentialsSection}
-        <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
-        <p style="color: #9ca3af; font-size: 12px; text-align: center;">Questions? Reply to this email for support.</p>
-      </div>
-    </div>`;
+  const textContent = `${isReturning ? 'Welcome back to PrepMMI!' : 'Welcome to PrepMMI!'}\n\n` +
+    `You now have ${unitCount} ${unitWord}.\n` +
+    (!isReturning ? `\nLogin: ${email} / ${password}\n` : '') +
+    `\nLog in at ${LOGIN_URL}\n`;
 
-  const textContent = `${isReturning ? 'Welcome Back!' : 'Welcome to PrepMMI!'}\n\nYou now have ${unitCount} ${unitWord}.\n` +
-    (!isReturning ? `\nLogin: ${email} / ${password}\n\nGo to ${APP_URL}/app to start.\n` : '');
-
-  const result = await sendEmail(email, subject, htmlContent, textContent);
+  const result = await sendEmail(email, subject, brandedEmailShell(isReturning ? 'Welcome back!' : 'Welcome to PrepMMI!', bodyHtml), textContent);
   if (!result.success) console.error(`❌ Failed to send email to ${email}:`, result.error);
 }
 
@@ -376,19 +400,50 @@ app.post('/api/send-email', async (req, res) => {
     const sanitizedEmail = sanitizeEmail(email);
     if (content.length > 500000) return res.status(413).json({ success: false, message: 'Content too large' });
 
-    const htmlContent = `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h2 style="color: #111827;">Your PrepMMI Results</h2>
-        <p>Here are your detailed results:</p>
-        <div style="white-space: pre-wrap; background: #f5f5f5; padding: 20px; border-radius: 8px;">${content.replace(/\n/g, '<br>')}</div>
-      </div>`;
+    const bodyHtml = `
+      <p style="font-size:15px;color:#374151;margin:0 0 16px;">Here are your results from today's circuit.</p>
+      <div style="white-space: pre-wrap; background: #F3F5F6; padding: 20px; border-radius: 10px; font-size:14px; color:#12181F; line-height:1.6;">${content.replace(/\n/g, '<br>')}</div>`;
 
-    const result = await sendEmail(sanitizedEmail, `Your PrepMMI Results`, htmlContent, content);
+    const result = await sendEmail(sanitizedEmail, `Your PrepMMI Results`, brandedEmailShell('Your PrepMMI Results', bodyHtml), content);
     if (result.success) res.json({ success: true, message: 'Email sent successfully', messageId: result.id });
     else res.status(500).json({ success: false, message: 'Failed to send email', error: result.error });
   } catch (err) {
     console.error('❌ Email error:', err.message);
     return res.status(500).json({ success: false, message: 'Failed to send email' });
+  }
+});
+
+// ── SAVE CIRCUIT HISTORY (called after AI grading finishes) ──────────────
+app.post('/api/save-results', async (req, res) => {
+  try {
+    const { userId, overallScore, overallSummary, date, stations } = req.body;
+    if (!userId || !date) return res.status(400).json({ success: false, message: 'Missing userId or date' });
+
+    const userRef = db.collection('artifacts').doc('default-app-id').collection('public').doc('data').collection('users').doc(userId);
+    const userDoc = await userRef.get();
+    if (!userDoc.exists) return res.status(404).json({ success: false, message: 'User not found' });
+
+    const entry = {
+      date,
+      overallScore: overallScore || null,
+      overallSummary: (overallSummary || '').slice(0, 4000),
+      stations: Array.isArray(stations)
+        ? stations.slice(0, 12).map(s => ({
+            category: String(s.category || '').slice(0, 100),
+            prompt: String(s.prompt || '').slice(0, 2000),
+            feedback: String(s.feedback || '').slice(0, 4000)
+          }))
+        : []
+    };
+
+    const existing = userDoc.data().interviewHistory || [];
+    // Keep the most recent 25 circuits so the doc doesn't grow unbounded.
+    const updated = [...existing, entry].slice(-25);
+    await userRef.update({ interviewHistory: updated });
+    res.json({ success: true });
+  } catch (err) {
+    console.error('❌ save-results error:', err);
+    res.status(500).json({ success: false, message: 'Failed to save results' });
   }
 });
 

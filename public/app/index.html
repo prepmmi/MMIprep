@@ -41,13 +41,39 @@
   .brand .dot{width:8px;height:8px;border-radius:50%;background:var(--signal);display:inline-block;margin-right:6px;}
   .brand img{width:22px;height:22px;display:inline-block;vertical-align:middle;margin-right:6px;}
   .pill{background:var(--paper-2);border-radius:20px;padding:6px 14px;font-family:var(--font-mono);font-size:12.5px;font-weight:600;}
+  .pw-wrap{position:relative;}
+  .pw-wrap input{padding-right:64px;}
+  .pw-toggle{position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--muted);font-size:12.5px;font-weight:700;padding:6px 8px;cursor:pointer;}
+  .pw-toggle:hover{color:var(--ink);}
+  .account-menu{position:relative;}
+  .account-menu-btn{background:none;border:1px solid var(--line);border-radius:20px;padding:7px 14px;font-size:13px;font-weight:600;color:var(--ink);cursor:pointer;}
+  .account-dropdown{position:absolute;right:0;top:calc(100% + 8px);background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:0 12px 30px rgba(18,24,31,0.12);min-width:170px;overflow:hidden;z-index:15;}
+  .account-dropdown button{display:block;width:100%;text-align:left;padding:12px 16px;background:none;border:none;font-size:13.5px;color:var(--ink);cursor:pointer;font-weight:500;}
+  .account-dropdown button:hover{background:var(--paper-2);}
 
   /* dashboard */
-  .dash-wrap{max-width:520px;margin:100px auto 60px;padding:0 24px;}
-  .stat-card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:28px;text-align:center;margin-bottom:20px;}
-  .stat-num{font-family:var(--font-mono);font-size:44px;font-weight:600;color:var(--signal);}
-  .stat-label{font-size:13px;color:var(--muted);margin-top:2px;}
-  .history-item{border-bottom:1px solid var(--line);padding:12px 0;font-size:13.5px;display:flex;justify-content:space-between;color:var(--muted);}
+  .dash-wrap{max-width:640px;margin:100px auto 60px;padding:0 24px;}
+  .stat-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:20px;}
+  .stat-card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px 16px;text-align:center;}
+  .stat-card.big{padding:28px;}
+  .stat-num{font-family:var(--font-mono);font-size:34px;font-weight:600;color:var(--signal);}
+  .stat-card.big .stat-num{font-size:44px;}
+  .stat-label{font-size:12px;color:var(--muted);margin-top:2px;}
+  .tab-row{display:flex;gap:6px;margin:24px 0 16px;border-bottom:1px solid var(--line);}
+  .tab-btn{background:none;border:none;padding:10px 16px;font-size:13.5px;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;}
+  .tab-btn.active{color:var(--signal);border-bottom-color:var(--signal);}
+  .tab-panel{display:none;}
+  .tab-panel.active{display:block;}
+  .history-item{border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:10px;cursor:pointer;background:var(--card);}
+  .history-item .row{display:flex;justify-content:space-between;align-items:center;font-size:13.5px;}
+  .history-item .date{color:var(--muted);}
+  .history-item .score{font-family:var(--font-mono);font-weight:700;color:var(--signal);}
+  .history-item .summary{display:none;margin-top:10px;padding-top:10px;border-top:1px solid var(--line);font-size:13.5px;line-height:1.6;}
+  .history-item.open .summary{display:block;}
+  .empty-state{text-align:center;padding:40px 20px;color:var(--muted);font-size:13.5px;}
+  .tip-card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin-bottom:12px;}
+  .tip-card h4{font-family:var(--font-display);font-size:14.5px;margin:0 0 6px;}
+  .tip-card p{font-size:13.5px;margin:0;line-height:1.5;}
 
   /* station screen */
   .station-wrap{max-width:640px;margin:0 auto;padding:100px 24px 60px;}
@@ -92,23 +118,96 @@
     <label>Email</label>
     <input type="email" id="loginEmail" placeholder="you@email.com">
     <label>Password</label>
-    <input type="password" id="loginPassword">
+    <div class="pw-wrap">
+      <input type="password" id="loginPassword">
+      <button type="button" class="pw-toggle" id="loginPwToggle" onclick="togglePwVisibility('loginPassword','loginPwToggle')" aria-label="Show password">Show</button>
+    </div>
     <button class="btn-primary" id="loginBtn" onclick="doLogin()">Log In</button>
+    <button type="button" class="btn-ghost" style="width:100%;text-align:center;margin-top:6px;" onclick="openForgotPassword()">Forgot password?</button>
     <div class="err" id="loginErr"></div>
+  </div>
+</div>
+
+<!-- FORGOT PASSWORD -->
+<div id="forgotModal" class="hidden screen" style="position:fixed;inset:0;background:rgba(18,24,31,0.55);z-index:30;">
+  <div class="card">
+    <h2>Reset your password</h2>
+    <p>We'll email you a link to set a new password.</p>
+    <label>Email</label>
+    <input type="email" id="forgotEmail" placeholder="you@email.com">
+    <button class="btn-primary" onclick="sendForgotPasswordEmail()">Send Reset Link</button>
+    <button class="btn-ghost" style="width:100%;text-align:center;" onclick="closeForgotPassword()">Cancel</button>
+    <div class="err" id="forgotErr"></div>
+    <p class="ok" id="forgotOk" style="display:none;color:var(--good);font-size:13px;margin-top:10px;">Check your inbox for a reset link.</p>
+  </div>
+</div>
+
+<!-- CHANGE PASSWORD (logged in) -->
+<div id="changePwModal" class="hidden screen" style="position:fixed;inset:0;background:rgba(18,24,31,0.55);z-index:30;">
+  <div class="card">
+    <h2>Change password</h2>
+    <p>Enter your current password, then your new one.</p>
+    <label>Current password</label>
+    <div class="pw-wrap">
+      <input type="password" id="currentPw">
+      <button type="button" class="pw-toggle" id="currentPwToggle" onclick="togglePwVisibility('currentPw','currentPwToggle')" aria-label="Show password">Show</button>
+    </div>
+    <label>New password</label>
+    <div class="pw-wrap">
+      <input type="password" id="newPw" minlength="6">
+      <button type="button" class="pw-toggle" id="newPwToggle" onclick="togglePwVisibility('newPw','newPwToggle')" aria-label="Show password">Show</button>
+    </div>
+    <button class="btn-primary" onclick="submitChangePassword()">Update Password</button>
+    <button class="btn-ghost" style="width:100%;text-align:center;" onclick="closeChangePassword()">Cancel</button>
+    <div class="err" id="changePwErr"></div>
+    <p class="ok" id="changePwOk" style="display:none;color:var(--good);font-size:13px;margin-top:10px;">Password updated.</p>
   </div>
 </div>
 
 <!-- DASHBOARD -->
 <div id="dashboardScreen" class="hidden">
   <div class="dash-wrap">
-    <div class="stat-card">
+    <div class="stat-card big" style="margin-bottom:20px;">
       <div class="stat-num" id="circuitsRemaining">—</div>
       <div class="stat-label">circuits remaining</div>
       <button class="btn-primary" id="startBtn" onclick="openInstructions()">Start a Circuit</button>
     </div>
-    <div id="historyCard" class="stat-card hidden" style="text-align:left;">
-      <h3>Past Circuits</h3>
+
+    <div class="stat-row">
+      <div class="stat-card">
+        <div class="stat-num" id="statCompleted" style="font-size:26px;">—</div>
+        <div class="stat-label">completed</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" id="statAvgScore" style="font-size:26px;">—</div>
+        <div class="stat-label">avg score</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" id="statBestScore" style="font-size:26px;">—</div>
+        <div class="stat-label">best score</div>
+      </div>
+    </div>
+
+    <div class="tab-row">
+      <button class="tab-btn active" id="tabBtn-overview" onclick="switchTab('overview')">Overview</button>
+      <button class="tab-btn" id="tabBtn-history" onclick="switchTab('history')">History</button>
+      <button class="tab-btn" id="tabBtn-tips" onclick="switchTab('tips')">Tips</button>
+    </div>
+
+    <div class="tab-panel active" id="tabPanel-overview">
+      <div id="overviewLatest"></div>
+    </div>
+
+    <div class="tab-panel" id="tabPanel-history">
       <div id="historyList"></div>
+    </div>
+
+    <div class="tab-panel" id="tabPanel-tips">
+      <div class="tip-card"><h4>Think out loud</h4><p>Interviewers are scoring your reasoning process, not just your final answer — narrate the trade-offs you're weighing as you get to it.</p></div>
+      <div class="tip-card"><h4>Use the full prep window</h4><p>A quick outline of 2-3 points before you start talking beats improvising — it keeps your answer structured under pressure.</p></div>
+      <div class="tip-card"><h4>It's OK to pause</h4><p>A short pause to collect your thoughts reads as composed, not unprepared. Silence feels longer to you than it does to an interviewer.</p></div>
+      <div class="tip-card"><h4>Watch your own playback</h4><p>Re-watching your response after each station is the fastest way to catch filler words, posture, and pacing habits you can't feel in the moment.</p></div>
+      <div class="tip-card"><h4>Look at the camera, not the screen</h4><p>Position your webcam near eye level — glancing down at your own video feed reads as broken eye contact on review.</p></div>
     </div>
   </div>
 </div>
@@ -118,9 +217,10 @@
   <div class="card">
     <h2>Before you start</h2>
     <p style="margin-bottom:14px;">Six stations, back to back. For each one:</p>
-    <p>1. Read the prompt during a timed prep window (no recording yet)</p>
+    <p>1. Read the prompt during a timed prep window — or click "Start Answering Now" to skip ahead</p>
     <p>2. Recording starts automatically when prep ends</p>
-    <p>3. Answer out loud — recording stops automatically at the time limit, or click Stop early</p>
+    <p>3. Answer out loud — recording stops automatically at the time limit, or click Stop Early</p>
+    <p>4. Watch your answer back, then continue or re-record that station</p>
     <p style="margin-top:14px;">You'll need to allow camera and microphone access.</p>
     <div style="background:var(--paper-2);border-radius:10px;padding:14px 16px;margin-top:16px;">
       <p style="font-weight:600;color:var(--ink);margin-bottom:8px;">Customize your feedback</p>
@@ -158,6 +258,7 @@
     <div class="phase-label" id="phaseLabel">Read Prompt</div>
     <div class="big-clock" id="bigClock">02:00</div>
 
+    <button class="btn-secondary hidden" id="skipPrepBtn" style="width:100%;" onclick="skipPrep()">Start Answering Now</button>
     <button class="btn-secondary hidden" id="stopBtn" style="width:100%;" onclick="stopRecording()">Stop Early</button>
   </div>
 </div>
@@ -190,6 +291,7 @@
         <h3>Overall Summary</h3>
         <div class="feedback-body" id="overallSummaryBody"></div>
       </div>
+      <button class="btn-secondary" style="width:100%;margin-bottom:10px;" id="emailResultsBtn" onclick="emailResults()">Email Me These Results</button>
       <button class="btn-primary" onclick="backToDashboard()">Back to Dashboard</button>
     </div>
   </div>
@@ -198,7 +300,7 @@
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut, sendPasswordResetEmail, EmailAuthProvider, reauthenticateWithCredential, updatePassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 // ── CONFIG — fill these in ──────────────────────────────────────────────
 const firebaseConfig = {
@@ -258,8 +360,14 @@ onAuthStateChanged(auth, async (user) => {
   if (user) {
     currentUser = { uid: user.uid, email: user.email };
     await loadDashboard();
-    document.getElementById('topBarRight').innerHTML =
-      `<button class="btn-ghost" onclick="doLogout()">Log out</button>`;
+    document.getElementById('topBarRight').innerHTML = `
+      <div class="account-menu">
+        <button class="account-menu-btn" onclick="toggleAccountMenu()">${currentUser.email} ▾</button>
+        <div class="account-dropdown hidden" id="accountDropdown">
+          <button onclick="openChangePassword()">Change password</button>
+          <button onclick="doLogout()">Log out</button>
+        </div>
+      </div>`;
     showScreen('dashboardScreen');
   } else {
     currentUser = null;
@@ -270,6 +378,90 @@ onAuthStateChanged(auth, async (user) => {
 
 window.doLogout = function() { signOut(auth); };
 
+window.toggleAccountMenu = function() {
+  document.getElementById('accountDropdown').classList.toggle('hidden');
+};
+document.addEventListener('click', (e) => {
+  const menu = document.querySelector('.account-menu');
+  const dropdown = document.getElementById('accountDropdown');
+  if (menu && dropdown && !menu.contains(e.target)) dropdown.classList.add('hidden');
+});
+
+// ── PASSWORD VISIBILITY / RESET / CHANGE ─────────────────────────────────
+window.togglePwVisibility = function(inputId, btnId) {
+  const input = document.getElementById(inputId);
+  const btn = document.getElementById(btnId);
+  const showing = input.type === 'text';
+  input.type = showing ? 'password' : 'text';
+  btn.textContent = showing ? 'Show' : 'Hide';
+};
+
+window.openForgotPassword = function() {
+  document.getElementById('forgotEmail').value = document.getElementById('loginEmail').value.trim();
+  document.getElementById('forgotErr').style.display = 'none';
+  document.getElementById('forgotOk').style.display = 'none';
+  document.getElementById('forgotModal').classList.remove('hidden');
+};
+window.closeForgotPassword = function() { document.getElementById('forgotModal').classList.add('hidden'); };
+
+window.sendForgotPasswordEmail = async function() {
+  const email = document.getElementById('forgotEmail').value.trim();
+  const errDiv = document.getElementById('forgotErr');
+  errDiv.style.display = 'none';
+  if (!email) { errDiv.textContent = 'Enter your email first.'; errDiv.style.display = 'block'; return; }
+  try {
+    await sendPasswordResetEmail(auth, email);
+    document.getElementById('forgotOk').style.display = 'block';
+  } catch (e) {
+    errDiv.textContent = 'Could not send reset email — check the address and try again.';
+    errDiv.style.display = 'block';
+  }
+};
+
+window.openChangePassword = function() {
+  document.getElementById('accountDropdown').classList.add('hidden');
+  document.getElementById('currentPw').value = '';
+  document.getElementById('newPw').value = '';
+  document.getElementById('changePwErr').style.display = 'none';
+  document.getElementById('changePwOk').style.display = 'none';
+  document.getElementById('changePwModal').classList.remove('hidden');
+};
+window.closeChangePassword = function() { document.getElementById('changePwModal').classList.add('hidden'); };
+
+window.submitChangePassword = async function() {
+  const currentPw = document.getElementById('currentPw').value;
+  const newPw = document.getElementById('newPw').value;
+  const errDiv = document.getElementById('changePwErr');
+  errDiv.style.display = 'none';
+  if (!currentPw || !newPw || newPw.length < 6) {
+    errDiv.textContent = 'New password must be at least 6 characters.';
+    errDiv.style.display = 'block';
+    return;
+  }
+  try {
+    const credential = EmailAuthProvider.credential(auth.currentUser.email, currentPw);
+    await reauthenticateWithCredential(auth.currentUser, credential);
+    await updatePassword(auth.currentUser, newPw);
+    document.getElementById('changePwOk').style.display = 'block';
+    setTimeout(closeChangePassword, 1200);
+  } catch (e) {
+    errDiv.textContent = 'Could not update password — check your current password and try again.';
+    errDiv.style.display = 'block';
+  }
+};
+
+// ── DASHBOARD ─────────────────────────────────────────────────────────
+window.switchTab = function(name) {
+  ['overview', 'history', 'tips'].forEach(t => {
+    document.getElementById(`tabBtn-${t}`).classList.toggle('active', t === name);
+    document.getElementById(`tabPanel-${t}`).classList.toggle('active', t === name);
+  });
+};
+
+window.toggleHistoryItem = function(el) {
+  el.classList.toggle('open');
+};
+
 async function loadDashboard() {
   const userRef = doc(db, 'artifacts', 'default-app-id', 'public', 'data', 'users', currentUser.uid);
   const snap = await getDoc(userRef);
@@ -279,13 +471,33 @@ async function loadDashboard() {
   document.getElementById('circuitsRemaining').textContent = currentUser.unitsRemaining;
   document.getElementById('startBtn').disabled = currentUser.unitsRemaining < 1;
 
-  const history = data.interviewHistory || [];
-  if (history.length > 0) {
-    document.getElementById('historyCard').classList.remove('hidden');
-    document.getElementById('historyList').innerHTML = history.slice().reverse().map(h =>
-      `<div class="history-item"><span>${new Date(h.date).toLocaleDateString()}</span><span>${h.overallScore ? h.overallScore + '/10' : '—'}</span></div>`
-    ).join('');
+  const history = (data.interviewHistory || []).slice().reverse();
+  const scores = history.map(h => parseFloat(h.overallScore)).filter(s => !isNaN(s));
+  document.getElementById('statCompleted').textContent = history.length;
+  document.getElementById('statAvgScore').textContent = scores.length ? (scores.reduce((a,b)=>a+b,0)/scores.length).toFixed(1) : '—';
+  document.getElementById('statBestScore').textContent = scores.length ? Math.max(...scores).toFixed(1) : '—';
+
+  if (history.length === 0) {
+    document.getElementById('overviewLatest').innerHTML = `<div class="empty-state">No circuits yet — start your first one above.</div>`;
+    document.getElementById('historyList').innerHTML = `<div class="empty-state">Your past circuits will show up here.</div>`;
+  } else {
+    const latest = history[0];
+    document.getElementById('overviewLatest').innerHTML = `
+      <h3 style="margin-bottom:10px;">Most Recent Circuit</h3>
+      ${renderHistoryItem(latest, true)}`;
+    document.getElementById('historyList').innerHTML = history.map(h => renderHistoryItem(h, false)).join('');
   }
+}
+
+function renderHistoryItem(h, forceOpen) {
+  const summaryHtml = h.overallSummary ? marked.parse(h.overallSummary) : '<p>No summary saved for this circuit.</p>';
+  return `<div class="history-item${forceOpen ? ' open' : ''}" onclick="toggleHistoryItem(this)">
+      <div class="row">
+        <span class="date">${new Date(h.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+        <span class="score">${h.overallScore ? h.overallScore + '/10' : '—'}</span>
+      </div>
+      <div class="summary">${summaryHtml}</div>
+    </div>`;
 }
 
 // ── INSTRUCTIONS / START ─────────────────────────────────────────────────
@@ -347,6 +559,7 @@ function displayCurrentStation() {
   document.getElementById('promptText').textContent = station.prompt;
   document.getElementById('recDot').classList.add('hidden');
   document.getElementById('stopBtn').classList.add('hidden');
+  document.getElementById('skipPrepBtn').classList.remove('hidden');
   renderStationProgress();
 
   phaseSecondsLeft = station.prepSeconds || 120;
@@ -363,6 +576,12 @@ function displayCurrentStation() {
   }, 1000);
 }
 
+window.skipPrep = function(station) {
+  if (phaseTimerInterval) clearInterval(phaseTimerInterval);
+  document.getElementById('skipPrepBtn').classList.add('hidden');
+  startRecording(circuit[stationIndex]);
+};
+
 function updateClock() {
   const m = Math.floor(phaseSecondsLeft / 60).toString().padStart(2, '0');
   const s = (phaseSecondsLeft % 60).toString().padStart(2, '0');
@@ -373,6 +592,7 @@ function startRecording(station) {
   document.getElementById('phaseLabel').textContent = 'Respond';
   document.getElementById('recDot').classList.remove('hidden');
   document.getElementById('stopBtn').classList.remove('hidden');
+  document.getElementById('skipPrepBtn').classList.add('hidden');
   recordedChunks = [];
   const candidateMimeTypes = ['video/webm;codecs=vp9', 'video/webm;codecs=vp8', 'video/webm', 'video/mp4'];
   const supportedMimeType = candidateMimeTypes.find(
@@ -659,16 +879,47 @@ async function runAnalysis() {
   } catch (e) { overallSummary = 'Summary unavailable.'; }
 
   renderResults(avgScore, overallSummary);
+  lastOverallSummary = overallSummary;
 
-  // Persist a lightweight history entry via the backend admin-free endpoint.
-  // (Uses the existing get-circuit user doc path; safe because it only appends.)
+  // Persist a full history entry (per-station feedback + overall summary,
+  // no video — history only needs text) so the dashboard has something to show.
   try {
     await fetch(`${API_BASE}/api/save-results`, {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ userId: currentUser.uid, overallScore: avgScore, date: new Date().toISOString() })
+      body: JSON.stringify({
+        userId: currentUser.uid,
+        overallScore: avgScore,
+        overallSummary,
+        date: new Date().toISOString(),
+        stations: stationResults.map(r => ({ category: r.category, prompt: r.prompt, feedback: r.feedback }))
+      })
     });
   } catch (e) { /* non-blocking */ }
 }
+
+let lastOverallSummary = '';
+
+window.emailResults = async function() {
+  const btn = document.getElementById('emailResultsBtn');
+  btn.disabled = true;
+  const originalText = btn.textContent;
+  btn.textContent = 'Sending...';
+  const content = stationResults.map((r, i) =>
+    `Station ${i + 1} — ${r.category}\n\n${r.feedback}`
+  ).join('\n\n-----\n\n') + `\n\n=====\nOverall Summary\n=====\n\n${lastOverallSummary}`;
+  try {
+    const resp = await fetch(`${API_BASE}/api/send-email`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: currentUser.email, content })
+    });
+    const data = await resp.json();
+    btn.textContent = data.success ? 'Sent — check your inbox' : 'Could not send';
+  } catch (e) {
+    btn.textContent = 'Could not send';
+  } finally {
+    setTimeout(() => { btn.disabled = false; btn.textContent = originalText; }, 3000);
+  }
+};
 
 function base64ToBlobUrl(base64, mimeType) {
   const byteChars = atob(base64);

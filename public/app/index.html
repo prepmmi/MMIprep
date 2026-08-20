@@ -75,6 +75,32 @@
   .tip-card h4{font-family:var(--font-display);font-size:14.5px;margin:0 0 6px;}
   .tip-card p{font-size:13.5px;margin:0;line-height:1.5;}
 
+  /* instructions modal */
+  .steps-list{display:flex;flex-direction:column;gap:14px;}
+  .step-row{display:flex;gap:14px;align-items:flex-start;}
+  .step-num{flex-shrink:0;width:26px;height:26px;border-radius:50%;background:var(--ink);color:#fff;font-family:var(--font-mono);font-size:12.5px;font-weight:700;display:flex;align-items:center;justify-content:center;margin-top:1px;}
+  .step-row strong{display:block;font-size:14.5px;color:var(--ink);margin-bottom:2px;}
+  .step-row span{display:block;font-size:13px;color:var(--muted);line-height:1.45;}
+  .cam-note{margin-top:16px;font-size:13px;background:var(--paper-2);border-radius:9px;padding:10px 12px;color:var(--ink);}
+  .option-block{background:var(--paper-2);border-radius:12px;padding:16px 18px;margin-top:14px;}
+  .option-block-title{font-weight:700;color:var(--ink);font-size:14px;margin:0 0 4px;}
+  .option-block-sub{margin:0 0 10px;font-size:12.5px;color:var(--muted);line-height:1.4;}
+  .check-row{display:flex;align-items:flex-start;gap:10px;padding:7px 0;font-size:13.5px;color:var(--ink);cursor:pointer;}
+  .check-row input{width:auto;margin-top:2px;}
+  .check-row.disabled-row{opacity:0.55;cursor:default;}
+
+  /* dashboard flourish */
+  .dash-header{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:18px;}
+  .dash-greeting{font-family:var(--font-display);font-size:22px;font-weight:600;}
+  .dash-sub{font-size:13px;color:var(--muted);margin-top:2px;}
+  .streak-pill{background:var(--ink);color:#fff;font-family:var(--font-mono);font-size:12px;font-weight:700;padding:7px 14px;border-radius:20px;white-space:nowrap;}
+  .stat-card.big{position:relative;overflow:hidden;background:linear-gradient(135deg,var(--ink) 0%,#232C38 100%);}
+  .stat-card.big .stat-num{color:#fff;}
+  .stat-card.big .stat-label{color:rgba(255,255,255,0.65);}
+  .stat-card.big::after{content:"";position:absolute;top:-40px;right:-40px;width:140px;height:140px;border-radius:50%;background:radial-gradient(circle,rgba(255,90,46,0.35),transparent 70%);}
+  .stat-card.big .btn-primary{position:relative;z-index:1;}
+  .quote-strip{font-family:var(--font-display);font-size:14.5px;color:var(--ink);border-left:3px solid var(--signal);padding:10px 16px;margin-bottom:20px;background:var(--card);border-radius:0 10px 10px 0;}
+
   /* station screen */
   .station-wrap{max-width:640px;margin:0 auto;padding:100px 24px 60px;}
   .category-tag{font-family:var(--font-mono);font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--signal);font-weight:700;margin-bottom:10px;}
@@ -167,6 +193,16 @@
 <!-- DASHBOARD -->
 <div id="dashboardScreen" class="hidden">
   <div class="dash-wrap">
+    <div class="dash-header">
+      <div>
+        <div class="dash-greeting" id="dashGreeting">Welcome back</div>
+        <div class="dash-sub" id="dashSub">Let's get another circuit in.</div>
+      </div>
+      <div class="streak-pill" id="weekPill">0 this week</div>
+    </div>
+
+    <div class="quote-strip" id="dashQuote"></div>
+
     <div class="stat-card big" style="margin-bottom:20px;">
       <div class="stat-num" id="circuitsRemaining">—</div>
       <div class="stat-label">circuits remaining</div>
@@ -213,29 +249,41 @@
 </div>
 
 <!-- INSTRUCTIONS MODAL -->
-<div id="instructionsModal" class="hidden screen" style="position:fixed;inset:0;background:rgba(18,24,31,0.55);z-index:20;">
-  <div class="card">
+<div id="instructionsModal" class="hidden screen" style="position:fixed;inset:0;background:rgba(18,24,31,0.55);z-index:20;padding:24px;">
+  <div class="card wide" style="max-height:88vh;overflow-y:auto;">
     <h2>Before you start</h2>
-    <p style="margin-bottom:14px;">Six stations, back to back. For each one:</p>
-    <p>1. Read the prompt during a timed prep window — or click "Start Answering Now" to skip ahead</p>
-    <p>2. Recording starts automatically when prep ends</p>
-    <p>3. Answer out loud — recording stops automatically at the time limit, or click Stop Early</p>
-    <p>4. Watch your answer back, then continue or re-record that station</p>
-    <p style="margin-top:14px;">You'll need to allow camera and microphone access.</p>
-    <div style="background:var(--paper-2);border-radius:10px;padding:14px 16px;margin-top:16px;">
-      <p style="font-weight:600;color:var(--ink);margin-bottom:8px;">Customize your feedback</p>
-      <p style="margin-bottom:10px;">Content Quality is always graded. Toggle the rest based on what you want to focus on today.</p>
-      <label style="display:flex;align-items:center;gap:10px;padding:6px 0;opacity:0.6;">
+    <p style="margin-bottom:18px;">Six stations, back to back. Here's how each one runs:</p>
+
+    <div class="steps-list">
+      <div class="step-row"><div class="step-num">1</div><div><strong>Read the prompt</strong><span>during a timed prep window — or click "Start Answering Now" to skip ahead</span></div></div>
+      <div class="step-row"><div class="step-num">2</div><div><strong>Recording starts</strong><span>automatically the moment prep time runs out</span></div></div>
+      <div class="step-row"><div class="step-num">3</div><div><strong>Answer out loud</strong><span>recording stops at the time limit, or click Stop Early</span></div></div>
+      <div class="step-row"><div class="step-num">4</div><div><strong>Review your take</strong><span>watch it back, then continue or re-record the station</span></div></div>
+    </div>
+    <p class="cam-note">📷 You'll be asked to allow camera and microphone access.</p>
+
+    <div class="option-block">
+      <p class="option-block-title">Customize your feedback</p>
+      <p class="option-block-sub">Content Quality is always graded. Toggle the rest based on what you want to focus on today.</p>
+      <label class="check-row disabled-row">
         <input type="checkbox" checked disabled> <span>Content Quality <em>(always on)</em></span>
       </label>
-      <label style="display:flex;align-items:center;gap:10px;padding:6px 0;">
+      <label class="check-row">
         <input type="checkbox" id="gradeVisual" checked> <span>Visual Presence — eye contact, posture, composure</span>
       </label>
-      <label style="display:flex;align-items:center;gap:10px;padding:6px 0;">
+      <label class="check-row">
         <input type="checkbox" id="gradeDelivery" checked> <span>Delivery — clarity, pace, filler words</span>
       </label>
-      <label style="display:flex;align-items:center;gap:10px;padding:6px 0;">
+      <label class="check-row">
         <input type="checkbox" id="gradeProfessionalism" checked> <span>Professionalism — setting, appearance</span>
+      </label>
+    </div>
+
+    <div class="option-block">
+      <p class="option-block-title">Retakes</p>
+      <p class="option-block-sub">Re-recording a station is great for practice, but the real thing is one shot — turn this off to simulate that pressure.</p>
+      <label class="check-row">
+        <input type="checkbox" id="allowRetries" checked> <span>Allow re-recording a station if I'm unhappy with a take</span>
       </label>
     </div>
     <button class="btn-primary" onclick="confirmStart()">Begin Circuit</button>
@@ -273,7 +321,7 @@
       <video id="reviewVideo" controls playsinline></video>
     </div>
     <button class="btn-primary" id="continueBtn" onclick="continueToNext()">Continue</button>
-    <button class="btn-secondary" style="width:100%;margin-top:10px;" onclick="reRecordStation()">Re-record This Station</button>
+    <button class="btn-secondary" style="width:100%;margin-top:10px;" id="reRecordBtn" onclick="reRecordStation()">Re-record This Station</button>
   </div>
 </div>
 
@@ -329,7 +377,7 @@ let circuit = [];
 let stationIndex = 0;
 let phaseTimerInterval = null;
 let stationResults = []; // { category, prompt, videoBase64, imageBase64, fileName, feedback }
-let gradingPrefs = { visual: true, delivery: true, professionalism: true };
+let gradingPrefs = { visual: true, delivery: true, professionalism: true, allowRetries: true };
 
 // ── SCREEN HELPERS ───────────────────────────────────────────────────────
 function showScreen(id) {
@@ -462,6 +510,14 @@ window.toggleHistoryItem = function(el) {
   el.classList.toggle('open');
 };
 
+const DASH_QUOTES = [
+  "\u201cThe interviewers aren't grading your answer — they're grading how you think.\u201d",
+  "\u201cComposure under an unexpected question is its own skill. Practice it here first.\u201d",
+  "\u201cA structured, average answer beats a brilliant, rambling one.\u201d",
+  "\u201cYou can't fake ease on interview day — you have to build it.\u201d",
+  "\u201cEvery circuit you run here is one less surprise on the real day.\u201d"
+];
+
 async function loadDashboard() {
   const userRef = doc(db, 'artifacts', 'default-app-id', 'public', 'data', 'users', currentUser.uid);
   const snap = await getDoc(userRef);
@@ -471,11 +527,23 @@ async function loadDashboard() {
   document.getElementById('circuitsRemaining').textContent = currentUser.unitsRemaining;
   document.getElementById('startBtn').disabled = currentUser.unitsRemaining < 1;
 
+  const firstName = (currentUser.email.split('@')[0] || '').split(/[._-]/)[0];
+  const displayName = firstName ? firstName.charAt(0).toUpperCase() + firstName.slice(1) : '';
+  document.getElementById('dashGreeting').textContent = displayName ? `Welcome back, ${displayName}` : 'Welcome back';
+  document.getElementById('dashQuote').textContent = DASH_QUOTES[Math.floor(Math.random() * DASH_QUOTES.length)];
+
   const history = (data.interviewHistory || []).slice().reverse();
   const scores = history.map(h => parseFloat(h.overallScore)).filter(s => !isNaN(s));
   document.getElementById('statCompleted').textContent = history.length;
   document.getElementById('statAvgScore').textContent = scores.length ? (scores.reduce((a,b)=>a+b,0)/scores.length).toFixed(1) : '—';
   document.getElementById('statBestScore').textContent = scores.length ? Math.max(...scores).toFixed(1) : '—';
+
+  const weekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
+  const thisWeek = history.filter(h => new Date(h.date).getTime() >= weekAgo).length;
+  document.getElementById('weekPill').textContent = `${thisWeek} this week`;
+  document.getElementById('dashSub').textContent = history.length
+    ? `${history.length} circuit${history.length === 1 ? '' : 's'} completed so far.`
+    : "Let's get your first circuit in.";
 
   if (history.length === 0) {
     document.getElementById('overviewLatest').innerHTML = `<div class="empty-state">No circuits yet — start your first one above.</div>`;
@@ -512,6 +580,7 @@ window.confirmStart = async function() {
   gradingPrefs.visual = document.getElementById('gradeVisual').checked;
   gradingPrefs.delivery = document.getElementById('gradeDelivery').checked;
   gradingPrefs.professionalism = document.getElementById('gradeProfessionalism').checked;
+  gradingPrefs.allowRetries = document.getElementById('allowRetries').checked;
   closeInstructions();
   try {
     mediaStream = await navigator.mediaDevices.getUserMedia({
@@ -650,6 +719,7 @@ async function handleRecordingComplete(station) {
   reviewVideo.src = URL.createObjectURL(videoBlob);
   document.getElementById('continueBtn').textContent =
     (stationIndex + 1 < circuit.length) ? 'Continue to Next Station' : 'Finish Circuit — See Results';
+  document.getElementById('reRecordBtn').classList.toggle('hidden', !gradingPrefs.allowRetries);
   showScreen('reviewScreen');
 }
 

@@ -4,4 +4,4 @@ Disallow: /app
 Disallow: /admin
 Disallow: /api/
 
-Sitemap: https://www.prepmmi.com/sitemap.xml
+Sitemap: https://prepmmi.com/sitemap.xml
